@@ -1,118 +1,39 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Simple Maze Game</title>
-
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      text-align: center;
-    }
-
-    #maze {
-      display: grid;
-      grid-template-columns: repeat(5, 60px);
-      grid-template-rows: repeat(5, 60px);
-      gap: 2px;
-      justify-content: center;
-      margin-top: 20px;
-    }
-
-    .cell {
-      width: 60px;
-      height: 60px;
-      background-color: #eee;
-    }
-
-    .wall {
-      background-color: black;
-    }
-
-    .player {
-      background-color: blue;
-    }
-
-    .goal {
-      background-color: green;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <title>Cheese World</title>
 </head>
-
 <body>
-  <h1>Maze Game</h1>
-  <p>Use arrow keys to reach the green square!</p>
 
-  <div id="maze"></div>
+    <h1>🧀 Welcome to Cheese World</h1>
 
-  <script>
-    const mazeLayout = [
-      [0, 1, 0, 0, 0],
-      [0, 1, 0, 1, 0],
-      [0, 0, 0, 1, 0],
-      [1, 1, 0, 1, 0],
-      [0, 0, 0, 0, 2]
-    ];
+    <p>Cheese World is a simple website dedicated to the love of cheese.</p>
 
-    const maze = document.getElementById("maze");
+    <h2>Our Favorite Cheeses</h2>
+    <ul>
+        <li>Cheddar</li>
+        <li>Mozzarella</li>
+        <li>Parmesan</li>
+        <li>Brie</li>
+        <li>Gouda</li>
+    </ul>
 
-    let playerPosition = { row: 0, col: 0 };
+    <h2>Why We Love Cheese</h2>
+    <p>
+        Cheese is delicious, versatile, and enjoyed all over the world.
+        It can be melted, sliced, grated, or eaten on its own.
+    </p>
 
-    function drawMaze() {
-      maze.innerHTML = "";
+    <h2>Contact Us</h2>
+    <p>Email: cheese@cheeseworld.com</p>
 
-      for (let row = 0; row < 5; row++) {
-        for (let col = 0; col < 5; col++) {
-          const cell = document.createElement("div");
-          cell.classList.add("cell");
+    <footer>
+        <p>© 2026 Cheese World</p>
+    </footer>
 
-          if (mazeLayout[row][col] === 1) {
-            cell.classList.add("wall");
-          }
-
-          if (mazeLayout[row][col] === 2) {
-            cell.classList.add("goal");
-          }
-
-          if (row === playerPosition.row && col === playerPosition.col) {
-            cell.classList.add("player");
-          }
-
-          maze.appendChild(cell);
-        }
-      }
-    }
-
-    function movePlayer(rowChange, colChange) {
-      const newRow = playerPosition.row + rowChange;
-      const newCol = playerPosition.col + colChange;
-
-      if (
-        newRow < 0 || newRow >= 5 ||
-        newCol < 0 || newCol >= 5
-      ) return;
-
-      if (mazeLayout[newRow][newCol] === 1) return;
-
-      playerPosition.row = newRow;
-      playerPosition.col = newCol;
-
-      if (mazeLayout[newRow][newCol] === 2) {
-        alert("You win!");
-      }
-
-      drawMaze();
-    }
-
-    document.addEventListener("keydown", (event) => {
-      if (event.key === "ArrowUp") movePlayer(-1, 0);
-      if (event.key === "ArrowDown") movePlayer(1, 0);
-      if (event.key === "ArrowLeft") movePlayer(0, -1);
-      if (event.key === "ArrowRight") movePlayer(0, 1);
-    });
-
-    drawMaze();
-  </script>
 </body>
 </html>
+
 
         
