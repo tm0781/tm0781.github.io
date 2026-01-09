@@ -1,22 +1,34 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Maze Game</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      background-color: #f0f0f0;
-      margin: 0;
-    }
-    .game-container {
-      display: grid;
-      grid-template-columns: repeat(10, 40px);
-      gri
-\
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Simple Pong</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="container">
+    <h1>Simple Pong</h1>
+    <div class="scoreboard">
+      <div class="score" id="playerScore">0</div>
+      <div class="score-label">Player</div>
+      <div class="vs">vs</div>
+      <div class="score-label">Computer</div>
+      <div class="score" id="computerScore">0</div>
+    </div>
+
+    <canvas id="gameCanvas" width="800" height="500"></canvas>
+
+    <div class="controls">
+      <button id="startBtn">Start / Restart</button>
+      <span>Controls: Mouse to move left paddle, or Up / Down arrows</span>
+    </div>
+
+    <p class="hint">Click Start to play. First to 10 wins (optional).</p>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
+
         
