@@ -1,33 +1,117 @@
-<!doctype html>
-<html lang="en">
+<!DOCTYPE html>
+<html>
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Simple Pong</title>
-  <link rel="stylesheet" href="style.css" />
+  <title>Simple Maze Game</title>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+    }
+
+    #maze {
+      display: grid;
+      grid-template-columns: repeat(5, 60px);
+      grid-template-rows: repeat(5, 60px);
+      gap: 2px;
+      justify-content: center;
+      margin-top: 20px;
+    }
+
+    .cell {
+      width: 60px;
+      height: 60px;
+      background-color: #eee;
+    }
+
+    .wall {
+      background-color: black;
+    }
+
+    .player {
+      background-color: blue;
+    }
+
+    .goal {
+      background-color: green;
+    }
+  </style>
 </head>
+
 <body>
-  <div class="container">
-    <h1>Simple Pong</h1>
-    <div class="scoreboard">
-      <div class="score" id="playerScore">0</div>
-      <div class="score-label">Player</div>
-      <div class="vs">vs</div>
-      <div class="score-label">Computer</div>
-      <div class="score" id="computerScore">0</div>
-    </div>
+  <h1>Maze Game</h1>
+  <p>Use arrow keys to reach the green square!</p>
 
-    <canvas id="gameCanvas" width="800" height="500"></canvas>
+  <div id="maze"></div>
 
-    <div class="controls">
-      <button id="startBtn">Start / Restart</button>
-      <span>Controls: Mouse to move left paddle, or Up / Down arrows</span>
-    </div>
+  <script>
+    const mazeLayout = [
+      [0, 1, 0, 0, 0],
+      [0, 1, 0, 1, 0],
+      [0, 0, 0, 1, 0],
+      [1, 1, 0, 1, 0],
+      [0, 0, 0, 0, 2]
+    ];
 
-    <p class="hint">Click Start to play. First to 10 wins (optional).</p>
-  </div>
+    const maze = document.getElementById("maze");
 
-  <script src="script.js"></script>
+    let playerPosition = { row: 0, col: 0 };
+
+    function drawMaze() {
+      maze.innerHTML = "";
+
+      for (let row = 0; row < 5; row++) {
+        for (let col = 0; col < 5; col++) {
+          const cell = document.createElement("div");
+          cell.classList.add("cell");
+
+          if (mazeLayout[row][col] === 1) {
+            cell.classList.add("wall");
+          }
+
+          if (mazeLayout[row][col] === 2) {
+            cell.classList.add("goal");
+          }
+
+          if (row === playerPosition.row && col === playerPosition.col) {
+            cell.classList.add("player");
+          }
+
+          maze.appendChild(cell);
+        }
+      }
+    }
+
+    function movePlayer(rowChange, colChange) {
+      const newRow = playerPosition.row + rowChange;
+      const newCol = playerPosition.col + colChange;
+
+      if (
+        newRow < 0 || newRow >= 5 ||
+        newCol < 0 || newCol >= 5
+      ) return;
+
+      if (mazeLayout[newRow][newCol] === 1) return;
+
+      playerPosition.row = newRow;
+      playerPosition.col = newCol;
+
+      if (mazeLayout[newRow][newCol] === 2) {
+        alert("You win!");
+      }
+
+      drawMaze();
+    }
+
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "ArrowUp") movePlayer(-1, 0);
+      if (event.key === "ArrowDown") movePlayer(1, 0);
+      if (event.key === "ArrowLeft") movePlayer(0, -1);
+      if (event.key === "ArrowRight") movePlayer(0, 1);
+    });
+
+    drawMaze();
+  </script>
 </body>
 </html>
 
