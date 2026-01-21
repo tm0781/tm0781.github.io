@@ -1,0 +1,15 @@
+body {
+  text-align: center;
+  font-family: Arial;
+  background-color: lightblue;
+}
+
+img {
+  border: 2px solid black;
+  margin: 10px;
+}
+
+.good {
+  color: green;
+  font-weight: bold;
+}
