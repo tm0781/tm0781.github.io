@@ -32,3 +32,14 @@ img {
   font-weight: bold;
   font-size: 18px;
 }
+.parts {
+  display: flex;
+  justify-content: center;
+}
+
+.card {
+  background-color: white;
+  padding: 10px;
+  margin: 10px;
+  border-radius: 10px;
+}
