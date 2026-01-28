@@ -1,19 +1,13 @@
 body {
-  font-family: Arial;
-  background-color: #eef6ff;
   text-align: center;
-}
-
-h1 {
-  background-color: #4a90e2;
-  color: white;
-  padding: 15px;
+  font-family: Arial;
+  background-color: #eaf2ff;
 }
 
 a {
   display: inline-block;
   margin: 10px;
-  padding: 12px;
+  padding: 12px 16px;
   background-color: white;
   color: black;
   text-decoration: none;
@@ -21,25 +15,3 @@ a {
   border-radius: 8px;
 }
 
-img {
-  width: 180px;
-  border-radius: 10px;
-  border: 2px solid black;
-}
-
-.good {
-  color: green;
-  font-weight: bold;
-  font-size: 18px;
-}
-.parts {
-  display: flex;
-  justify-content: center;
-}
-
-.card {
-  background-color: white;
-  padding: 10px;
-  margin: 10px;
-  border-radius: 10px;
-}
