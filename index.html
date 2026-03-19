@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>save the balls </title>
+    <title>Reflex Test: Neon Adventure</title>
 
     <style>
         body {
@@ -16,6 +16,16 @@
             position: relative;
             width: 100vw;
             height: 100vh;
+        }
+
+        #title {
+            position: absolute;
+            top: 10px;
+            width: 100%;
+            text-align: center;
+            font-size: 28px;
+            color: cyan;
+            text-shadow: 0 0 10px cyan;
         }
 
         #basket {
@@ -41,31 +51,38 @@
 
         #score {
             position: absolute;
-            top: 15px;
+            top: 50px;
             left: 15px;
             font-size: 22px;
         }
 
-        /* GAME OVER SCREEN */
+        /* GAME OVER */
         #gameOver {
             position: absolute;
             width: 100%;
             height: 100%;
-            background: rgba(0,0,0,0.85);
+            background: rgba(0,0,0,0.9);
             display: none;
             justify-content: center;
             align-items: center;
             flex-direction: column;
             font-size: 40px;
+            color: cyan;
+            text-shadow: 0 0 15px cyan;
         }
 
         #gameOver button {
             margin-top: 20px;
-            padding: 10px 20px;
+            padding: 12px 25px;
             font-size: 18px;
             border: none;
             background: cyan;
             cursor: pointer;
+            border-radius: 8px;
+        }
+
+        #gameOver button:hover {
+            background: white;
         }
 
         /* TRAIL */
@@ -84,6 +101,7 @@
 <body>
 
 <div id="game">
+    <div id="title">⚡ Reflex Test: Neon Adventure ⚡</div>
     <div id="score">Score: 0</div>
     <div id="basket"></div>
 
@@ -95,17 +113,16 @@
 
 <script>
 let basket = document.getElementById("basket");
-let game = document.getElementById("game");
 let score = 0;
 let speed = 20;
 let running = true;
 
-/* MOVE BASKET */
+/* MOVE */
 document.addEventListener("mousemove", (e) => {
     basket.style.left = (e.pageX - 60) + "px";
 });
 
-/* CREATE PARTS */
+/* CREATE OBJECTS */
 function createPart() {
     if (!running) return;
 
@@ -113,34 +130,24 @@ function createPart() {
     part.className = "part " + (Math.random() > 0.2 ? "good" : "bad");
     part.style.left = Math.random() * (window.innerWidth - 30) + "px";
     part.style.top = "0px";
-    game.appendChild(part);
+    document.getElementById("game").appendChild(part);
 
     let fall = setInterval(() => {
         part.style.top = part.offsetTop + 5 + "px";
 
-        // catch
         if (
             part.offsetTop > window.innerHeight - 80 &&
             part.offsetLeft > basket.offsetLeft &&
             part.offsetLeft < basket.offsetLeft + 120
         ) {
-            if (part.classList.contains("good")) {
-                score += 10;
-            } else {
-                score -= 20;
-            }
-
+            score += part.classList.contains("good") ? 10 : -20;
             updateScore();
             part.remove();
             clearInterval(fall);
         }
 
-        // miss
         if (part.offsetTop > window.innerHeight) {
-            if (part.classList.contains("good")) {
-                score -= 10;
-            }
-
+            if (part.classList.contains("good")) score -= 10;
             updateScore();
             part.remove();
             clearInterval(fall);
@@ -149,7 +156,7 @@ function createPart() {
     }, speed);
 }
 
-/* SCORE + GAME OVER */
+/* SCORE */
 function updateScore() {
     document.getElementById("score").innerText = "Score: " + score;
 
@@ -164,19 +171,19 @@ function restart() {
     location.reload();
 }
 
-/* SPEED UP GAME */
+/* SPEED UP */
 setInterval(() => {
     if (running && speed > 8) speed--;
 }, 3000);
 
-/* SPAWN PARTS */
+/* SPAWN */
 setInterval(createPart, 800);
 
 /* TRAIL */
 let trail = [];
-let trailLength = 20;
+let length = 20;
 
-for (let i = 0; i < trailLength; i++) {
+for (let i = 0; i < length; i++) {
     let dot = document.createElement("div");
     dot.className = "trail";
     document.body.appendChild(dot);
@@ -190,19 +197,18 @@ document.addEventListener("mousemove", (e) => {
 
 function animateTrail() {
     for (let i = 0; i < trail.length; i++) {
-        let current = trail[i];
+        let cur = trail[i];
         let next = trail[i - 1];
 
         if (i !== 0) {
-            current.x += (next.x - current.x) * 0.4;
-            current.y += (next.y - current.y) * 0.4;
+            cur.x += (next.x - cur.x) * 0.4;
+            cur.y += (next.y - cur.y) * 0.4;
         }
 
-        current.el.style.left = current.x + "px";
-        current.el.style.top = current.y + "px";
-
-        current.el.style.transform = `scale(${1 - i / trail.length})`;
-        current.el.style.opacity = 1 - i / trail.length;
+        cur.el.style.left = cur.x + "px";
+        cur.el.style.top = cur.y + "px";
+        cur.el.style.transform = `scale(${1 - i / length})`;
+        cur.el.style.opacity = 1 - i / length;
     }
 
     requestAnimationFrame(animateTrail);
