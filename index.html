@@ -6,7 +6,7 @@
     <style>
         body {
             margin: 0;
-            background: #0d0d0d;
+            background: radial-gradient(circle, #0a0a0a, #000);
             color: white;
             font-family: Arial;
             overflow: hidden;
@@ -23,19 +23,21 @@
             bottom: 30px;
             width: 120px;
             height: 20px;
-            background: cyan;
+            background: linear-gradient(90deg, cyan, blue);
             border-radius: 20px;
-            box-shadow: 0 0 15px cyan;
+            box-shadow: 0 0 20px cyan;
         }
 
         .part {
             position: absolute;
             width: 30px;
             height: 30px;
-            background: orange;
             border-radius: 6px;
-            box-shadow: 0 0 10px orange;
+            box-shadow: 0 0 15px;
         }
+
+        .good { background: lime; box-shadow: 0 0 15px lime; }
+        .bad { background: red; box-shadow: 0 0 15px red; }
 
         #score {
             position: absolute;
@@ -44,7 +46,29 @@
             font-size: 22px;
         }
 
-        /* trail dots */
+        /* GAME OVER SCREEN */
+        #gameOver {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.85);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            font-size: 40px;
+        }
+
+        #gameOver button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            font-size: 18px;
+            border: none;
+            background: cyan;
+            cursor: pointer;
+        }
+
+        /* TRAIL */
         .trail {
             position: absolute;
             width: 10px;
@@ -52,7 +76,6 @@
             border-radius: 50%;
             pointer-events: none;
             background: cyan;
-            opacity: 0.7;
             box-shadow: 0 0 10px cyan;
         }
     </style>
@@ -63,26 +86,31 @@
 <div id="game">
     <div id="score">Score: 0</div>
     <div id="basket"></div>
+
+    <div id="gameOver">
+        💀 Game Over
+        <button onclick="restart()">Restart</button>
+    </div>
 </div>
 
 <script>
 let basket = document.getElementById("basket");
 let game = document.getElementById("game");
 let score = 0;
+let speed = 20;
+let running = true;
 
-/* =====================
-   BASKET MOVEMENT
-===================== */
+/* MOVE BASKET */
 document.addEventListener("mousemove", (e) => {
     basket.style.left = (e.pageX - 60) + "px";
 });
 
-/* =====================
-   FALLING PARTS
-===================== */
+/* CREATE PARTS */
 function createPart() {
+    if (!running) return;
+
     let part = document.createElement("div");
-    part.className = "part";
+    part.className = "part " + (Math.random() > 0.2 ? "good" : "bad");
     part.style.left = Math.random() * (window.innerWidth - 30) + "px";
     part.style.top = "0px";
     game.appendChild(part);
@@ -96,32 +124,58 @@ function createPart() {
             part.offsetLeft > basket.offsetLeft &&
             part.offsetLeft < basket.offsetLeft + 120
         ) {
-            score += 10;
-            document.getElementById("score").innerText = "Score: " + score;
+            if (part.classList.contains("good")) {
+                score += 10;
+            } else {
+                score -= 20;
+            }
+
+            updateScore();
             part.remove();
             clearInterval(fall);
         }
 
         // miss
         if (part.offsetTop > window.innerHeight) {
-            score -= 5;
-            document.getElementById("score").innerText = "Score: " + score;
+            if (part.classList.contains("good")) {
+                score -= 10;
+            }
+
+            updateScore();
             part.remove();
             clearInterval(fall);
         }
 
-    }, 20);
+    }, speed);
 }
 
-setInterval(createPart, 900);
+/* SCORE + GAME OVER */
+function updateScore() {
+    document.getElementById("score").innerText = "Score: " + score;
 
-/* =====================
-   SUPER COOL TRAIL
-===================== */
+    if (score < -50) {
+        running = false;
+        document.getElementById("gameOver").style.display = "flex";
+    }
+}
+
+/* RESTART */
+function restart() {
+    location.reload();
+}
+
+/* SPEED UP GAME */
+setInterval(() => {
+    if (running && speed > 8) speed--;
+}, 3000);
+
+/* SPAWN PARTS */
+setInterval(createPart, 800);
+
+/* TRAIL */
 let trail = [];
-let trailLength = 15;
+let trailLength = 20;
 
-// create trail elements
 for (let i = 0; i < trailLength; i++) {
     let dot = document.createElement("div");
     dot.className = "trail";
@@ -134,7 +188,6 @@ document.addEventListener("mousemove", (e) => {
     trail[0].y = e.pageY;
 });
 
-// animate trail
 function animateTrail() {
     for (let i = 0; i < trail.length; i++) {
         let current = trail[i];
@@ -148,7 +201,6 @@ function animateTrail() {
         current.el.style.left = current.x + "px";
         current.el.style.top = current.y + "px";
 
-        // fade + size effect
         current.el.style.transform = `scale(${1 - i / trail.length})`;
         current.el.style.opacity = 1 - i / trail.length;
     }
@@ -160,7 +212,7 @@ animateTrail();
 </script>
 
 </body>
-</html>\
+</html>
 
 
 
