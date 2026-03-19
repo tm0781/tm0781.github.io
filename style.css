@@ -2,7 +2,7 @@ body {
   margin: 0;
   font-family: Arial, sans-serif; /* Added a fallback font */
   overflow: hidden; /* Keeps scrollbars from appearing if content fits */
-  background: url("background.jpg") no-repeat center center fixed; /* Combined shorthand property */
+  background: url("background.jpg.jpeg") no-repeat center center fixed; /* Combined shorthand property */
   -webkit-background-size: cover;
   -moz-background-size: cover;
   -o-background-size: cover;
