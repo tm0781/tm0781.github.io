@@ -1,106 +1,166 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Build Your PC</title>
+    <title>PC Builder Game</title>
+
     <style>
         body {
             margin: 0;
-            font-family: Arial;
-            background: #121212;
+            background: #0d0d0d;
             color: white;
+            font-family: Arial;
             overflow: hidden;
         }
 
-        header {
-            text-align: center;
-            padding: 20px;
-            background: #1f1f1f;
+        #game {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
         }
 
-        .container {
-            display: flex;
-        }
-
-        .left {
-            width: 30%;
-            padding: 20px;
-            background: #1a1a1a;
-        }
-
-        .right {
-            width: 70%;
-            padding: 20px;
+        #basket {
+            position: absolute;
+            bottom: 30px;
+            width: 120px;
+            height: 20px;
+            background: cyan;
+            border-radius: 20px;
+            box-shadow: 0 0 15px cyan;
         }
 
         .part {
-            background: #2a2a2a;
-            padding: 10px;
-            margin: 10px 0;
-            border-radius: 5px;
-        }
-
-        .box {
-            background: #003366;
-            padding: 15px;
-            margin: 15px 0;
-            border-radius: 5px;
-        }
-
-        /* Trail dots */
-        .dot {
             position: absolute;
-            width: 8px;
-            height: 8px;
-            background: cyan;
+            width: 30px;
+            height: 30px;
+            background: orange;
+            border-radius: 6px;
+            box-shadow: 0 0 10px orange;
+        }
+
+        #score {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            font-size: 22px;
+        }
+
+        /* trail dots */
+        .trail {
+            position: absolute;
+            width: 10px;
+            height: 10px;
             border-radius: 50%;
             pointer-events: none;
+            background: cyan;
             opacity: 0.7;
+            box-shadow: 0 0 10px cyan;
         }
     </style>
 </head>
 
 <body>
 
-<header>
-    <h1>💻 Build Your PC</h1>
-</header>
-
-<div class="container">
-
-    <div class="left">
-        <h2>Parts</h2>
-        <div class="part">CPU: Ryzen 5 / Intel i7</div>
-        <div class="part">GPU: RTX 3060 / RX 6700</div>
-        <div class="part">RAM: 16GB / 32GB</div>
-        <div class="part">Storage: 512GB / 1TB SSD</div>
-    </div>
-
-    <div class="right">
-        <h2>Info</h2>
-        <div class="box"><b>CPU:</b> The brain of the computer.</div>
-        <div class="box"><b>GPU:</b> Handles graphics and gaming.</div>
-        <div class="box"><b>RAM:</b> Helps your computer run smoothly.</div>
-        <div class="box"><b>Storage:</b> Stores your files and games.</div>
-    </div>
-
+<div id="game">
+    <div id="score">Score: 0</div>
+    <div id="basket"></div>
 </div>
 
 <script>
-document.addEventListener("mousemove", function(e) {
-    let dot = document.createElement("div");
-    dot.className = "dot";
-    dot.style.left = e.pageX + "px";
-    dot.style.top = e.pageY + "px";
-    document.body.appendChild(dot);
+let basket = document.getElementById("basket");
+let game = document.getElementById("game");
+let score = 0;
 
-    setTimeout(() => {
-        dot.remove();
-    }, 500);
+/* =====================
+   BASKET MOVEMENT
+===================== */
+document.addEventListener("mousemove", (e) => {
+    basket.style.left = (e.pageX - 60) + "px";
 });
+
+/* =====================
+   FALLING PARTS
+===================== */
+function createPart() {
+    let part = document.createElement("div");
+    part.className = "part";
+    part.style.left = Math.random() * (window.innerWidth - 30) + "px";
+    part.style.top = "0px";
+    game.appendChild(part);
+
+    let fall = setInterval(() => {
+        part.style.top = part.offsetTop + 5 + "px";
+
+        // catch
+        if (
+            part.offsetTop > window.innerHeight - 80 &&
+            part.offsetLeft > basket.offsetLeft &&
+            part.offsetLeft < basket.offsetLeft + 120
+        ) {
+            score += 10;
+            document.getElementById("score").innerText = "Score: " + score;
+            part.remove();
+            clearInterval(fall);
+        }
+
+        // miss
+        if (part.offsetTop > window.innerHeight) {
+            score -= 5;
+            document.getElementById("score").innerText = "Score: " + score;
+            part.remove();
+            clearInterval(fall);
+        }
+
+    }, 20);
+}
+
+setInterval(createPart, 900);
+
+/* =====================
+   SUPER COOL TRAIL
+===================== */
+let trail = [];
+let trailLength = 15;
+
+// create trail elements
+for (let i = 0; i < trailLength; i++) {
+    let dot = document.createElement("div");
+    dot.className = "trail";
+    document.body.appendChild(dot);
+    trail.push({x: 0, y: 0, el: dot});
+}
+
+document.addEventListener("mousemove", (e) => {
+    trail[0].x = e.pageX;
+    trail[0].y = e.pageY;
+});
+
+// animate trail
+function animateTrail() {
+    for (let i = 0; i < trail.length; i++) {
+        let current = trail[i];
+        let next = trail[i - 1];
+
+        if (i !== 0) {
+            current.x += (next.x - current.x) * 0.4;
+            current.y += (next.y - current.y) * 0.4;
+        }
+
+        current.el.style.left = current.x + "px";
+        current.el.style.top = current.y + "px";
+
+        // fade + size effect
+        current.el.style.transform = `scale(${1 - i / trail.length})`;
+        current.el.style.opacity = 1 - i / trail.length;
+    }
+
+    requestAnimationFrame(animateTrail);
+}
+
+animateTrail();
 </script>
 
 </body>
-</html>
+</html>\
 
 
 
