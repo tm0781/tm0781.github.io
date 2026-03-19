@@ -1,23 +1,107 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Computer Parts</title>
-  <link rel="stylesheet" href="style.css">
+    <title>Build Your PC</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial;
+            background: #121212;
+            color: white;
+            overflow: hidden;
+        }
+
+        header {
+            text-align: center;
+            padding: 20px;
+            background: #1f1f1f;
+        }
+
+        .container {
+            display: flex;
+        }
+
+        .left {
+            width: 30%;
+            padding: 20px;
+            background: #1a1a1a;
+        }
+
+        .right {
+            width: 70%;
+            padding: 20px;
+        }
+
+        .part {
+            background: #2a2a2a;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+        }
+
+        .box {
+            background: #003366;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 5px;
+        }
+
+        /* Trail dots */
+        .dot {
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            background: cyan;
+            border-radius: 50%;
+            pointer-events: none;
+            opacity: 0.7;
+        }
+    </style>
 </head>
+
 <body>
 
-<h1>Computer Parts</h1>
-<p>Click a part to learn what it does</p>
+<header>
+    <h1>💻 Build Your PC</h1>
+</header>
 
-<a href="cpu.html">CPU</a>
-<a href="gpu.html">GPU</a>
-<a href="ram.html">RAM</a>
-<a href="storage.html">Storage</a>
-<a href="psu.html">Power Supply</a>
-<a href="motherboard.html">Motherboard</a>
+<div class="container">
+
+    <div class="left">
+        <h2>Parts</h2>
+        <div class="part">CPU: Ryzen 5 / Intel i7</div>
+        <div class="part">GPU: RTX 3060 / RX 6700</div>
+        <div class="part">RAM: 16GB / 32GB</div>
+        <div class="part">Storage: 512GB / 1TB SSD</div>
+    </div>
+
+    <div class="right">
+        <h2>Info</h2>
+        <div class="box"><b>CPU:</b> The brain of the computer.</div>
+        <div class="box"><b>GPU:</b> Handles graphics and gaming.</div>
+        <div class="box"><b>RAM:</b> Helps your computer run smoothly.</div>
+        <div class="box"><b>Storage:</b> Stores your files and games.</div>
+    </div>
+
+</div>
+
+<script>
+document.addEventListener("mousemove", function(e) {
+    let dot = document.createElement("div");
+    dot.className = "dot";
+    dot.style.left = e.pageX + "px";
+    dot.style.top = e.pageY + "px";
+    document.body.appendChild(dot);
+
+    setTimeout(() => {
+        dot.remove();
+    }, 500);
+});
+</script>
 
 </body>
 </html>
+
 
 
 
