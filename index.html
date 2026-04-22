@@ -6,12 +6,10 @@
     <style>
         body {
             margin: 0;
-       background-image: url("images/wp9081278.jpg");
-        background-size: cover; 
-      background-size: cover; 
-            color: white;
-            font-family: Arial;
             overflow: hidden;
+            font-family: Arial;
+            color: white;
+            background: url("background.jpg") no-repeat center center/cover;
         }
 
         #game {
@@ -22,22 +20,29 @@
 
         #title {
             position: absolute;
-            top: 10px;
+            top: 20px;
             width: 100%;
             text-align: center;
-            font-size: 28px;
+            font-size: 32px;
             color: cyan;
-            text-shadow: 0 0 10px cyan;
+            text-shadow: 0 0 15px cyan;
+        }
+
+        #score {
+            position: absolute;
+            top: 70px;
+            left: 20px;
+            font-size: 22px;
         }
 
         #basket {
             position: absolute;
-            bottom: 30px;
-            width: 120px;
+            bottom: 40px;
+            width: 140px;
             height: 20px;
-            background: linear-gradient(blue, violet, purple);
+            background: linear-gradient(90deg, cyan, purple);
             border-radius: 20px;
-            box-shadow: 0 0 20px cyan;
+            box-shadow: 0 0 25px cyan;
         }
 
         .part {
@@ -48,42 +53,33 @@
             box-shadow: 0 0 15px;
         }
 
-        .good { background: lime; box-shadow: 0 0 15px lime; }
-        .bad { background: red; box-shadow: 0 0 15px red; }
+        .good { background: #00ffcc; }
+        .bad { background: #ff0055; }
 
-        #score {
-            position: absolute;
-            top: 50px;
-            left: 15px;
-            font-size: 22px;
-        }
-
-        /* GAME OVER */
-        #gameOver {
+        /* SCREENS */
+        .screen {
             position: absolute;
             width: 100%;
             height: 100%;
-            background: rgba(0,0,0,0.9);
-            display: none;
+            background: rgba(0,0,0,0.85);
+            display: flex;
             justify-content: center;
             align-items: center;
             flex-direction: column;
-            font-size: 40px;
-            color: cyan;
-            text-shadow: 0 0 15px cyan;
+            text-align: center;
         }
 
-        #gameOver button {
+        button {
             margin-top: 20px;
             padding: 12px 25px;
             font-size: 18px;
-            border: none;
             background: cyan;
-            cursor: pointer;
+            border: none;
             border-radius: 8px;
+            cursor: pointer;
         }
 
-        #gameOver button:hover {
+        button:hover {
             background: white;
         }
 
@@ -97,6 +93,16 @@
             background: cyan;
             box-shadow: 0 0 10px cyan;
         }
+
+        /* PARTICLES */
+        .particle {
+            position: absolute;
+            width: 6px;
+            height: 6px;
+            background: cyan;
+            border-radius: 50%;
+            pointer-events: none;
+        }
     </style>
 </head>
 
@@ -107,24 +113,37 @@
     <div id="score">Score: 0</div>
     <div id="basket"></div>
 
-    <div id="gameOver">
-        💀 Game Over
-        <button onclick="restart()">Restart</button>
+    <div id="startScreen" class="screen">
+        <h1>⚡ Reflex Test ⚡</h1>
+        <p>Catch GOOD blocks • Avoid RED</p>
+        <button onclick="startGame()">Start Game</button>
+    </div>
+
+    <div id="gameOver" class="screen" style="display:none;">
+        <h1>💀 Game Over</h1>
+        <button onclick="restart()">Play Again</button>
     </div>
 </div>
 
 <script>
 let basket = document.getElementById("basket");
 let score = 0;
+let running = false;
 let speed = 20;
-let running = true;
+let combo = 0;
+
+/* START */
+function startGame() {
+    document.getElementById("startScreen").style.display = "none";
+    running = true;
+}
 
 /* MOVE */
 document.addEventListener("mousemove", (e) => {
-    basket.style.left = (e.pageX - 60) + "px";
+    basket.style.left = (e.pageX - 70) + "px";
 });
 
-/* CREATE OBJECTS */
+/* CREATE PART */
 function createPart() {
     if (!running) return;
 
@@ -135,27 +154,63 @@ function createPart() {
     document.getElementById("game").appendChild(part);
 
     let fall = setInterval(() => {
-        part.style.top = part.offsetTop + 5 + "px";
+        part.style.top = part.offsetTop + 6 + "px";
 
         if (
-            part.offsetTop > window.innerHeight - 80 &&
+            part.offsetTop > window.innerHeight - 90 &&
             part.offsetLeft > basket.offsetLeft &&
-            part.offsetLeft < basket.offsetLeft + 120
+            part.offsetLeft < basket.offsetLeft + 140
         ) {
-            score += part.classList.contains("good") ? 10 : -20;
+            if (part.classList.contains("good")) {
+                combo++;
+                score += 10 + combo;
+                explode(part.offsetLeft, part.offsetTop);
+            } else {
+                score -= 20;
+                combo = 0;
+            }
+
             updateScore();
             part.remove();
             clearInterval(fall);
         }
 
         if (part.offsetTop > window.innerHeight) {
-            if (part.classList.contains("good")) score -= 10;
+            if (part.classList.contains("good")) {
+                score -= 10;
+                combo = 0;
+            }
             updateScore();
             part.remove();
             clearInterval(fall);
         }
 
     }, speed);
+}
+
+/* PARTICLE EFFECT */
+function explode(x, y) {
+    for (let i = 0; i < 10; i++) {
+        let p = document.createElement("div");
+        p.className = "particle";
+        p.style.left = x + "px";
+        p.style.top = y + "px";
+        document.body.appendChild(p);
+
+        let dx = (Math.random() - 0.5) * 10;
+        let dy = (Math.random() - 0.5) * 10;
+
+        let life = setInterval(() => {
+            p.style.left = p.offsetLeft + dx + "px";
+            p.style.top = p.offsetTop + dy + "px";
+            p.style.opacity -= 0.05;
+
+            if (p.style.opacity <= 0) {
+                p.remove();
+                clearInterval(life);
+            }
+        }, 20);
+    }
 }
 
 /* SCORE */
@@ -173,19 +228,15 @@ function restart() {
     location.reload();
 }
 
-/* SPEED UP */
+/* SPAWN + SPEED */
+setInterval(createPart, 700);
 setInterval(() => {
     if (running && speed > 8) speed--;
 }, 3000);
 
-/* SPAWN */
-setInterval(createPart, 800);
-
 /* TRAIL */
 let trail = [];
-let length = 20;
-
-for (let i = 0; i < length; i++) {
+for (let i = 0; i < 20; i++) {
     let dot = document.createElement("div");
     dot.className = "trail";
     document.body.appendChild(dot);
@@ -209,21 +260,16 @@ function animateTrail() {
 
         cur.el.style.left = cur.x + "px";
         cur.el.style.top = cur.y + "px";
-        cur.el.style.transform = `scale(${1 - i / length})`;
-        cur.el.style.opacity = 1 - i / length;
+        cur.el.style.opacity = 1 - i / trail.length;
     }
 
     requestAnimationFrame(animateTrail);
 }
-
 animateTrail();
 </script>
 
 </body>
 </html>
-
-
-
 
 
         
