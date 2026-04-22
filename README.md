@@ -1,4 +1,31 @@
-hello my name is tamar and i created a website about computers
-when you enter the website you are gonna see a bunch of computer parts and when you click one of the parts it will tell you if it id good or not 
+About
 
-dev perspective: how im going to make it is im going add images of pc parts i saw on google and ill make so if you interacte with the images it shows good part or not 
+This is a simple neon-style reflex game I made using HTML, CSS, and JavaScript.
+You move your mouse to catch good blocks and avoid bad ones.
+
+How to Play
+Move your mouse to control the bar
+Catch green blocks = +points
+Hit red blocks = lose points
+Game ends if your score gets too low
+
+Dev Notes
+
+I made this in one file (index.html) to keep it simple.
+Main things I worked on:
+
+Mouse movement
+Falling objects
+Score system
+Cool neon effects and trail
+How to Run
+
+Just open index.html in your browser.
+
+Files
+index.html → the game
+background.jpg → background image
+
+ Me
+
+Made by me 
