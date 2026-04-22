@@ -1,128 +1,103 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Reflex Test: Neon Adventure</title>
+<title>Reflex Test: Neon Adventure</title>
 
-    <style>
-        body {
-            margin: 0;
-            overflow: hidden;
-            font-family: Arial;
-            color: white;
-            background: url("background.jpg") no-repeat center center/cover;
-        }
+<style>
+body {
+    margin: 0;
+    overflow: hidden;
+    font-family: Arial;
+    color: white;
+    background: url("background.jpg") no-repeat center center/cover;
+}
 
-        #game {
-            position: relative;
-            width: 100vw;
-            height: 100vh;
-        }
+/* UI */
+#title {
+    position: absolute;
+    top: 10px;
+    width: 100%;
+    text-align: center;
+    font-size: 30px;
+    color: cyan;
+    text-shadow: 0 0 15px cyan;
+}
 
-        #title {
-            position: absolute;
-            top: 20px;
-            width: 100%;
-            text-align: center;
-            font-size: 32px;
-            color: cyan;
-            text-shadow: 0 0 15px cyan;
-        }
+#score, #high {
+    position: absolute;
+    left: 15px;
+    font-size: 20px;
+}
+#score { top: 50px; }
+#high { top: 80px; }
 
-        #score {
-            position: absolute;
-            top: 70px;
-            left: 20px;
-            font-size: 22px;
-        }
+#basket {
+    position: absolute;
+    bottom: 40px;
+    width: 140px;
+    height: 20px;
+    background: linear-gradient(90deg, cyan, purple);
+    border-radius: 20px;
+    box-shadow: 0 0 25px cyan;
+}
 
-        #basket {
-            position: absolute;
-            bottom: 40px;
-            width: 140px;
-            height: 20px;
-            background: linear-gradient(90deg, cyan, purple);
-            border-radius: 20px;
-            box-shadow: 0 0 25px cyan;
-        }
+/* blocks */
+.part {
+    position: absolute;
+    width: 30px;
+    height: 30px;
+    border-radius: 6px;
+}
+.good { background: #00ffcc; box-shadow: 0 0 15px #00ffcc; }
+.bad { background: #ff0044; box-shadow: 0 0 15px red; }
 
-        .part {
-            position: absolute;
-            width: 30px;
-            height: 30px;
-            border-radius: 6px;
-            box-shadow: 0 0 15px;
-        }
+/* screens */
+.screen {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.9);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
 
-        .good { background: #00ffcc; }
-        .bad { background: #ff0055; }
+button {
+    padding: 12px 25px;
+    margin-top: 20px;
+    font-size: 18px;
+    background: cyan;
+    border: none;
+    cursor: pointer;
+}
 
-        /* SCREENS */
-        .screen {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.85);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            flex-direction: column;
-            text-align: center;
-        }
-
-        button {
-            margin-top: 20px;
-            padding: 12px 25px;
-            font-size: 18px;
-            background: cyan;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-        }
-
-        button:hover {
-            background: white;
-        }
-
-        /* TRAIL */
-        .trail {
-            position: absolute;
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-            pointer-events: none;
-            background: cyan;
-            box-shadow: 0 0 10px cyan;
-        }
-
-        /* PARTICLES */
-        .particle {
-            position: absolute;
-            width: 6px;
-            height: 6px;
-            background: cyan;
-            border-radius: 50%;
-            pointer-events: none;
-        }
-    </style>
+/* trail */
+.trail {
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    pointer-events: none;
+}
+</style>
 </head>
 
 <body>
 
-<div id="game">
-    <div id="title">⚡ Reflex Test: Neon Adventure ⚡</div>
-    <div id="score">Score: 0</div>
-    <div id="basket"></div>
+<div id="title">⚡ Reflex Test: Neon Adventure ⚡</div>
+<div id="score">Score: 0</div>
+<div id="high">High Score: 0</div>
+<div id="basket"></div>
 
-    <div id="startScreen" class="screen">
-        <h1>⚡ Reflex Test ⚡</h1>
-        <p>Catch GOOD blocks • Avoid RED</p>
-        <button onclick="startGame()">Start Game</button>
-    </div>
+<div id="start" class="screen">
+<h1>Start Game</h1>
+<button onclick="start()">Play</button>
+</div>
 
-    <div id="gameOver" class="screen" style="display:none;">
-        <h1>💀 Game Over</h1>
-        <button onclick="restart()">Play Again</button>
-    </div>
+<div id="over" class="screen" style="display:none;">
+<h1>Game Over</h1>
+<button onclick="restart()">Restart</button>
 </div>
 
 <script>
@@ -130,142 +105,136 @@ let basket = document.getElementById("basket");
 let score = 0;
 let running = false;
 let speed = 20;
-let combo = 0;
 
-/* START */
-function startGame() {
-    document.getElementById("startScreen").style.display = "none";
-    running = true;
-}
+// HIGH SCORE
+let high = localStorage.getItem("high") || 0;
+document.getElementById("high").innerText = "High Score: " + high;
 
-/* MOVE */
-document.addEventListener("mousemove", (e) => {
+// MOVE
+document.addEventListener("mousemove", e => {
     basket.style.left = (e.pageX - 70) + "px";
 });
 
-/* CREATE PART */
-function createPart() {
-    if (!running) return;
+// START
+function start(){
+    document.getElementById("start").style.display = "none";
+    running = true;
+}
 
-    let part = document.createElement("div");
-    part.className = "part " + (Math.random() > 0.2 ? "good" : "bad");
-    part.style.left = Math.random() * (window.innerWidth - 30) + "px";
-    part.style.top = "0px";
-    document.getElementById("game").appendChild(part);
+// CREATE BLOCKS
+function spawn(){
+    if(!running) return;
 
-    let fall = setInterval(() => {
-        part.style.top = part.offsetTop + 6 + "px";
+    let p = document.createElement("div");
+    p.className = "part " + (Math.random()>0.2?"good":"bad");
+    p.style.left = Math.random()*window.innerWidth+"px";
+    p.style.top = "0px";
+    document.body.appendChild(p);
 
-        if (
-            part.offsetTop > window.innerHeight - 90 &&
-            part.offsetLeft > basket.offsetLeft &&
-            part.offsetLeft < basket.offsetLeft + 140
-        ) {
-            if (part.classList.contains("good")) {
-                combo++;
-                score += 10 + combo;
-                explode(part.offsetLeft, part.offsetTop);
+    let fall = setInterval(()=>{
+        p.style.top = p.offsetTop+6+"px";
+
+        // catch
+        if(p.offsetTop>window.innerHeight-90 &&
+           p.offsetLeft>basket.offsetLeft &&
+           p.offsetLeft<basket.offsetLeft+140){
+
+            if(p.classList.contains("good")){
+                score+=10;
+                beep(800);
             } else {
-                score -= 20;
-                combo = 0;
+                score-=20;
+                shake();
+                beep(200);
             }
 
-            updateScore();
-            part.remove();
+            update();
+            p.remove();
             clearInterval(fall);
         }
 
-        if (part.offsetTop > window.innerHeight) {
-            if (part.classList.contains("good")) {
-                score -= 10;
-                combo = 0;
-            }
-            updateScore();
-            part.remove();
+        // miss
+        if(p.offsetTop>window.innerHeight){
+            if(p.classList.contains("good")) score-=10;
+            update();
+            p.remove();
             clearInterval(fall);
         }
 
-    }, speed);
+    },speed);
 }
 
-/* PARTICLE EFFECT */
-function explode(x, y) {
-    for (let i = 0; i < 10; i++) {
-        let p = document.createElement("div");
-        p.className = "particle";
-        p.style.left = x + "px";
-        p.style.top = y + "px";
-        document.body.appendChild(p);
+setInterval(spawn,700);
 
-        let dx = (Math.random() - 0.5) * 10;
-        let dy = (Math.random() - 0.5) * 10;
+// SCORE
+function update(){
+    document.getElementById("score").innerText="Score: "+score;
 
-        let life = setInterval(() => {
-            p.style.left = p.offsetLeft + dx + "px";
-            p.style.top = p.offsetTop + dy + "px";
-            p.style.opacity -= 0.05;
+    if(score>high){
+        high=score;
+        localStorage.setItem("high",high);
+        document.getElementById("high").innerText="High Score: "+high;
+    }
 
-            if (p.style.opacity <= 0) {
-                p.remove();
-                clearInterval(life);
-            }
-        }, 20);
+    if(score<-50){
+        running=false;
+        document.getElementById("over").style.display="flex";
+        beep(100);
     }
 }
 
-/* SCORE */
-function updateScore() {
-    document.getElementById("score").innerText = "Score: " + score;
+// RESTART
+function restart(){ location.reload(); }
 
-    if (score < -50) {
-        running = false;
-        document.getElementById("gameOver").style.display = "flex";
-    }
+// SCREEN SHAKE
+function shake(){
+    document.body.style.transform="translate(5px)";
+    setTimeout(()=>document.body.style.transform="translate(-5px)",50);
+    setTimeout(()=>document.body.style.transform="translate(0)",100);
 }
 
-/* RESTART */
-function restart() {
-    location.reload();
+// SOUND
+function beep(freq){
+    let ctx=new AudioContext();
+    let o=ctx.createOscillator();
+    let g=ctx.createGain();
+    o.connect(g); g.connect(ctx.destination);
+    o.frequency.value=freq;
+    o.start();
+    g.gain.exponentialRampToValueAtTime(0.0001,ctx.currentTime+0.2);
 }
 
-/* SPAWN + SPEED */
-setInterval(createPart, 700);
-setInterval(() => {
-    if (running && speed > 8) speed--;
-}, 3000);
-
-/* TRAIL */
-let trail = [];
-for (let i = 0; i < 20; i++) {
-    let dot = document.createElement("div");
-    dot.className = "trail";
-    document.body.appendChild(dot);
-    trail.push({x: 0, y: 0, el: dot});
+// RAINBOW TRAIL
+let trail=[];
+for(let i=0;i<20;i++){
+    let d=document.createElement("div");
+    d.className="trail";
+    document.body.appendChild(d);
+    trail.push({x:0,y:0,el:d});
 }
 
-document.addEventListener("mousemove", (e) => {
-    trail[0].x = e.pageX;
-    trail[0].y = e.pageY;
+document.addEventListener("mousemove",e=>{
+    trail[0].x=e.pageX;
+    trail[0].y=e.pageY;
 });
 
-function animateTrail() {
-    for (let i = 0; i < trail.length; i++) {
-        let cur = trail[i];
-        let next = trail[i - 1];
+function animate(){
+    for(let i=0;i<trail.length;i++){
+        let t=trail[i];
+        let n=trail[i-1];
 
-        if (i !== 0) {
-            cur.x += (next.x - cur.x) * 0.4;
-            cur.y += (next.y - cur.y) * 0.4;
+        if(i!==0){
+            t.x+=(n.x-t.x)*0.4;
+            t.y+=(n.y-t.y)*0.4;
         }
 
-        cur.el.style.left = cur.x + "px";
-        cur.el.style.top = cur.y + "px";
-        cur.el.style.opacity = 1 - i / trail.length;
+        t.el.style.left=t.x+"px";
+        t.el.style.top=t.y+"px";
+        t.el.style.background=`hsl(${i*20},100%,50%)`;
     }
-
-    requestAnimationFrame(animateTrail);
+    requestAnimationFrame(animate);
 }
-animateTrail();
+animate();
 </script>
 
 </body>
