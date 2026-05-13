@@ -1,244 +1,338 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>Reflex Test: Neon Adventure</title>
+    <title>Reflex Test: Neon Adventure</title>
 
-<style>
-body {
-    margin: 0;
-    overflow: hidden;
-    font-family: Arial;
-    color: white;
-    background: url("background.jpg") no-repeat center center/cover;
-}
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            font-family: Arial;
+            background-image: url("background.jpg");
+            background-size: cover;
+            background-position: center;
+            color: white;
+        }
 
-/* UI */
-#title {
-    position: absolute;
-    top: 10px;
-    width: 100%;
-    text-align: center;
-    font-size: 30px;
-    color: cyan;
-    text-shadow: 0 0 15px cyan;
-}
+        #title {
+            position: absolute;
+            top: 10px;
+            width: 100%;
+            text-align: center;
+            font-size: 32px;
+            color: cyan;
+            text-shadow: 0 0 15px cyan;
+        }
 
-#score, #high {
-    position: absolute;
-    left: 15px;
-    font-size: 20px;
-}
-#score { top: 50px; }
-#high { top: 80px; }
+        #score {
+            position: absolute;
+            top: 60px;
+            left: 20px;
+            font-size: 24px;
+            text-shadow: 0 0 10px black;
+        }
 
-#basket {
-    position: absolute;
-    bottom: 40px;
-    width: 140px;
-    height: 20px;
-    background: linear-gradient(90deg, cyan, purple);
-    border-radius: 20px;
-    box-shadow: 0 0 25px cyan;
-}
+        #highscore {
+            position: absolute;
+            top: 95px;
+            left: 20px;
+            font-size: 20px;
+            text-shadow: 0 0 10px black;
+        }
 
-/* blocks */
-.part {
-    position: absolute;
-    width: 30px;
-    height: 30px;
-    border-radius: 6px;
-}
-.good { background: #00ffcc; box-shadow: 0 0 15px #00ffcc; }
-.bad { background: #ff0044; box-shadow: 0 0 15px red; }
+        #basket {
+            position: absolute;
+            bottom: 40px;
+            width: 140px;
+            height: 20px;
+            background: linear-gradient(90deg, #00ffff, #ff00ff);
+            border-radius: 20px;
+            box-shadow:
+                0 0 10px cyan,
+                0 0 20px cyan,
+                0 0 40px purple;
+        }
 
-/* screens */
-.screen {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    background: rgba(0,0,0,0.9);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    flex-direction: column;
-}
+        .part {
+            position: absolute;
+            width: 30px;
+            height: 30px;
+            border-radius: 8px;
+        }
 
-button {
-    padding: 12px 25px;
-    margin-top: 20px;
-    font-size: 18px;
-    background: cyan;
-    border: none;
-    cursor: pointer;
-}
+        .good {
+            background: #00ff99;
+            box-shadow: 0 0 15px #00ff99;
+        }
 
-/* trail */
-.trail {
-    position: absolute;
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    pointer-events: none;
-}
-</style>
+        .bad {
+            background: red;
+            box-shadow: 0 0 15px red;
+        }
+
+        #startScreen,
+        #gameOver {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+
+        #gameOver {
+            display: none;
+        }
+
+        h1 {
+            font-size: 50px;
+            color: cyan;
+            text-shadow: 0 0 20px cyan;
+        }
+
+        button {
+            padding: 15px 30px;
+            font-size: 20px;
+            border: none;
+            border-radius: 10px;
+            background: cyan;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        button:hover {
+            transform: scale(1.1);
+            background: white;
+        }
+
+        /* Rainbow trail */
+        .trail {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            pointer-events: none;
+        }
+    </style>
 </head>
 
 <body>
 
 <div id="title">⚡ Reflex Test: Neon Adventure ⚡</div>
+
 <div id="score">Score: 0</div>
-<div id="high">High Score: 0</div>
+<div id="highscore">High Score: 0</div>
+
 <div id="basket"></div>
 
-<div id="start" class="screen">
-<h1>Start Game</h1>
-<button onclick="start()">Play</button>
+<div id="startScreen">
+    <h1>Reflex Test</h1>
+    <button onclick="startGame()">PLAY</button>
 </div>
 
-<div id="over" class="screen" style="display:none;">
-<h1>Game Over</h1>
-<button onclick="restart()">Restart</button>
+<div id="gameOver">
+    <h1>GAME OVER</h1>
+    <button onclick="restartGame()">RESTART</button>
 </div>
 
 <script>
 let basket = document.getElementById("basket");
 let score = 0;
-let running = false;
-let speed = 20;
+let gameRunning = false;
+let speed = 18;
 
-// HIGH SCORE
-let high = localStorage.getItem("high") || 0;
-document.getElementById("high").innerText = "High Score: " + high;
+/* HIGH SCORE */
+let highscore = localStorage.getItem("highscore") || 0;
+document.getElementById("highscore").innerText =
+"High Score: " + highscore;
 
-// MOVE
-document.addEventListener("mousemove", e => {
-    basket.style.left = (e.pageX - 70) + "px";
-});
-
-// START
-function start(){
-    document.getElementById("start").style.display = "none";
-    running = true;
+/* START GAME */
+function startGame() {
+    document.getElementById("startScreen").style.display = "none";
+    gameRunning = true;
 }
 
-// CREATE BLOCKS
-function spawn(){
-    if(!running) return;
+/* RESTART */
+function restartGame() {
+    location.reload();
+}
 
-    let p = document.createElement("div");
-    p.className = "part " + (Math.random()>0.2?"good":"bad");
-    p.style.left = Math.random()*window.innerWidth+"px";
-    p.style.top = "0px";
-    document.body.appendChild(p);
+/* MOVE BASKET */
+document.addEventListener("mousemove", e => {
 
-    let fall = setInterval(()=>{
-        p.style.top = p.offsetTop+6+"px";
+    let x = e.pageX - 70;
 
-        // catch
-        if(p.offsetTop>window.innerHeight-90 &&
-           p.offsetLeft>basket.offsetLeft &&
-           p.offsetLeft<basket.offsetLeft+140){
+    if (x < 0) x = 0;
 
-            if(p.classList.contains("good")){
-                score+=10;
-                beep(800);
+    if (x > window.innerWidth - 140) {
+        x = window.innerWidth - 140;
+    }
+
+    basket.style.left = x + "px";
+});
+
+/* CREATE BLOCKS */
+function createPart() {
+
+    if (!gameRunning) return;
+
+    let part = document.createElement("div");
+
+    if (Math.random() > 0.25) {
+        part.className = "part good";
+    } else {
+        part.className = "part bad";
+    }
+
+    part.style.left =
+        Math.random() * (window.innerWidth - 30) + "px";
+
+    part.style.top = "0px";
+
+    document.body.appendChild(part);
+
+    let fall = setInterval(() => {
+
+        part.style.top = part.offsetTop + 6 + "px";
+
+        /* COLLISION */
+        if (
+            part.offsetTop > window.innerHeight - 90 &&
+            part.offsetLeft > basket.offsetLeft &&
+            part.offsetLeft < basket.offsetLeft + 140
+        ) {
+
+            if (part.classList.contains("good")) {
+                score += 10;
             } else {
-                score-=20;
-                shake();
-                beep(200);
+                score -= 20;
+                shakeScreen();
             }
 
-            update();
-            p.remove();
+            updateScore();
+
+            part.remove();
             clearInterval(fall);
         }
 
-        // miss
-        if(p.offsetTop>window.innerHeight){
-            if(p.classList.contains("good")) score-=10;
-            update();
-            p.remove();
+        /* MISSED */
+        if (part.offsetTop > window.innerHeight) {
+
+            if (part.classList.contains("good")) {
+                score -= 10;
+            }
+
+            updateScore();
+
+            part.remove();
             clearInterval(fall);
         }
 
-    },speed);
+    }, speed);
 }
 
-setInterval(spawn,700);
+/* UPDATE SCORE */
+function updateScore() {
 
-// SCORE
-function update(){
-    document.getElementById("score").innerText="Score: "+score;
+    document.getElementById("score").innerText =
+        "Score: " + score;
 
-    if(score>high){
-        high=score;
-        localStorage.setItem("high",high);
-        document.getElementById("high").innerText="High Score: "+high;
+    if (score > highscore) {
+        highscore = score;
+
+        localStorage.setItem("highscore", highscore);
+
+        document.getElementById("highscore").innerText =
+            "High Score: " + highscore;
     }
 
-    if(score<-50){
-        running=false;
-        document.getElementById("over").style.display="flex";
-        beep(100);
+    if (score < -50) {
+        gameRunning = false;
+
+        document.getElementById("gameOver").style.display = "flex";
     }
 }
 
-// RESTART
-function restart(){ location.reload(); }
+/* SCREEN SHAKE */
+function shakeScreen() {
 
-// SCREEN SHAKE
-function shake(){
-    document.body.style.transform="translate(5px)";
-    setTimeout(()=>document.body.style.transform="translate(-5px)",50);
-    setTimeout(()=>document.body.style.transform="translate(0)",100);
+    document.body.style.transform = "translateX(10px)";
+
+    setTimeout(() => {
+        document.body.style.transform = "translateX(-10px)";
+    }, 50);
+
+    setTimeout(() => {
+        document.body.style.transform = "translateX(0px)";
+    }, 100);
 }
 
-// SOUND
-function beep(freq){
-    let ctx=new AudioContext();
-    let o=ctx.createOscillator();
-    let g=ctx.createGain();
-    o.connect(g); g.connect(ctx.destination);
-    o.frequency.value=freq;
-    o.start();
-    g.gain.exponentialRampToValueAtTime(0.0001,ctx.currentTime+0.2);
+/* SPAWN */
+setInterval(createPart, 700);
+
+/* HARDER OVER TIME */
+setInterval(() => {
+
+    if (speed > 8 && gameRunning) {
+        speed--;
+    }
+
+}, 5000);
+
+/* RAINBOW TRAIL */
+let trail = [];
+
+for (let i = 0; i < 20; i++) {
+
+    let dot = document.createElement("div");
+
+    dot.className = "trail";
+
+    document.body.appendChild(dot);
+
+    trail.push({
+        x: 0,
+        y: 0,
+        el: dot
+    });
 }
 
-// RAINBOW TRAIL
-let trail=[];
-for(let i=0;i<20;i++){
-    let d=document.createElement("div");
-    d.className="trail";
-    document.body.appendChild(d);
-    trail.push({x:0,y:0,el:d});
-}
+document.addEventListener("mousemove", e => {
 
-document.addEventListener("mousemove",e=>{
-    trail[0].x=e.pageX;
-    trail[0].y=e.pageY;
+    trail[0].x = e.pageX;
+    trail[0].y = e.pageY;
 });
 
-function animate(){
-    for(let i=0;i<trail.length;i++){
-        let t=trail[i];
-        let n=trail[i-1];
+function animateTrail() {
 
-        if(i!==0){
-            t.x+=(n.x-t.x)*0.4;
-            t.y+=(n.y-t.y)*0.4;
+    for (let i = 0; i < trail.length; i++) {
+
+        let current = trail[i];
+        let next = trail[i - 1];
+
+        if (i !== 0) {
+
+            current.x += (next.x - current.x) * 0.35;
+            current.y += (next.y - current.y) * 0.35;
         }
 
-        t.el.style.left=t.x+"px";
-        t.el.style.top=t.y+"px";
-        t.el.style.background=`hsl(${i*20},100%,50%)`;
+        current.el.style.left = current.x + "px";
+        current.el.style.top = current.y + "px";
+
+        current.el.style.background =
+            `hsl(${i * 20}, 100%, 50%)`;
+
+        current.el.style.opacity =
+            1 - i / trail.length;
     }
-    requestAnimationFrame(animate);
+
+    requestAnimationFrame(animateTrail);
 }
-animate();
+
+animateTrail();
 </script>
 
 </body>
 </html>
-
-
-        
