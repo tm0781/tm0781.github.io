@@ -139,16 +139,18 @@
 
 <script>
 let basket = document.getElementById("basket");
+
 let score = 0;
 let gameRunning = false;
 let speed = 18;
 
 /* HIGH SCORE */
 let highscore = localStorage.getItem("highscore") || 0;
+
 document.getElementById("highscore").innerText =
 "High Score: " + highscore;
 
-/* START GAME */
+/* START */
 function startGame() {
     document.getElementById("startScreen").style.display = "none";
     gameRunning = true;
@@ -162,8 +164,9 @@ function restartGame() {
 /* MOVE BASKET */
 document.addEventListener("mousemove", e => {
 
-    let x = e.pageX - 70;
+    let x = e.clientX - 70;
 
+    /* keep basket inside screen */
     if (x < 0) x = 0;
 
     if (x > window.innerWidth - 140) {
@@ -180,29 +183,35 @@ function createPart() {
 
     let part = document.createElement("div");
 
-    if (Math.random() > 0.25) {
-        part.className = "part good";
-    } else {
-        part.className = "part bad";
-    }
+    part.className =
+        "part " + (Math.random() > 0.25 ? "good" : "bad");
 
     part.style.left =
         Math.random() * (window.innerWidth - 30) + "px";
 
-    part.style.top = "0px";
+    part.style.top = "-40px";
 
     document.body.appendChild(part);
 
     let fall = setInterval(() => {
 
-        part.style.top = part.offsetTop + 6 + "px";
+        let top = part.offsetTop + 6;
 
-        /* COLLISION */
-        if (
-            part.offsetTop > window.innerHeight - 90 &&
-            part.offsetLeft > basket.offsetLeft &&
-            part.offsetLeft < basket.offsetLeft + 140
-        ) {
+        part.style.top = top + "px";
+
+        /* collision */
+        let basketLeft = basket.offsetLeft;
+        let basketRight = basketLeft + basket.offsetWidth;
+
+        let partLeft = part.offsetLeft;
+        let partRight = partLeft + part.offsetWidth;
+
+        let touching =
+            partRight > basketLeft &&
+            partLeft < basketRight &&
+            top + 30 > window.innerHeight - 70;
+
+        if (touching) {
 
             if (part.classList.contains("good")) {
                 score += 10;
@@ -213,12 +222,12 @@ function createPart() {
 
             updateScore();
 
-            part.remove();
             clearInterval(fall);
+            part.remove();
         }
 
-        /* MISSED */
-        if (part.offsetTop > window.innerHeight) {
+        /* missed */
+        if (top > window.innerHeight) {
 
             if (part.classList.contains("good")) {
                 score -= 10;
@@ -226,8 +235,8 @@ function createPart() {
 
             updateScore();
 
-            part.remove();
             clearInterval(fall);
+            part.remove();
         }
 
     }, speed);
@@ -240,6 +249,7 @@ function updateScore() {
         "Score: " + score;
 
     if (score > highscore) {
+
         highscore = score;
 
         localStorage.setItem("highscore", highscore);
@@ -249,19 +259,21 @@ function updateScore() {
     }
 
     if (score < -50) {
+
         gameRunning = false;
 
-        document.getElementById("gameOver").style.display = "flex";
+        document.getElementById("gameOver").style.display =
+            "flex";
     }
 }
 
-/* SCREEN SHAKE */
+/* SHAKE */
 function shakeScreen() {
 
-    document.body.style.transform = "translateX(10px)";
+    document.body.style.transform = "translateX(8px)";
 
     setTimeout(() => {
-        document.body.style.transform = "translateX(-10px)";
+        document.body.style.transform = "translateX(-8px)";
     }, 50);
 
     setTimeout(() => {
@@ -272,10 +284,10 @@ function shakeScreen() {
 /* SPAWN */
 setInterval(createPart, 700);
 
-/* HARDER OVER TIME */
+/* HARD MODE */
 setInterval(() => {
 
-    if (speed > 8 && gameRunning) {
+    if (gameRunning && speed > 8) {
         speed--;
     }
 
@@ -301,8 +313,8 @@ for (let i = 0; i < 20; i++) {
 
 document.addEventListener("mousemove", e => {
 
-    trail[0].x = e.pageX;
-    trail[0].y = e.pageY;
+    trail[0].x = e.clientX;
+    trail[0].y = e.clientY;
 });
 
 function animateTrail() {
@@ -314,8 +326,11 @@ function animateTrail() {
 
         if (i !== 0) {
 
-            current.x += (next.x - current.x) * 0.35;
-            current.y += (next.y - current.y) * 0.35;
+            current.x +=
+                (next.x - current.x) * 0.35;
+
+            current.y +=
+                (next.y - current.y) * 0.35;
         }
 
         current.el.style.left = current.x + "px";
