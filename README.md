@@ -19,8 +19,8 @@ Includes:
 
 Files
 
-* `index.html`
-* `background.jpg`
+* index.html
+* background.jpg
 
 Made by me with a little mix of chatgbt and gemini to add flavor
 
@@ -40,17 +40,17 @@ It creates:
 
 Example:
 
-```html id="r4ykvk"
+``html id="r4ykvk"
 <div id="basket"></div>
-```
+``
 
 This creates the player basket.
 
 Another example:
 
-```html id="6js0lr"
+``html id="6js0lr"
 <div id="score">Score: 0</div>
-```
+``
 
 This creates the score display shown during the game.
 
@@ -70,17 +70,17 @@ It controls:
 
 Example:
 
-```css id="q94zvq"
+``css id="q94zvq"
 background-image: url("images/background.jpg");
-```
+``
 
 This adds the background image to the game.
 
 Another example:
 
-```css id="3gvc9n"
+``css id="3gvc9n"
 box-shadow: 0 0 20px cyan;
-'''
+''
 
 This creates the glowing neon effect.
 
