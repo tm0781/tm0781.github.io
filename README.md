@@ -103,10 +103,3 @@ The game includes:
 * Background image
 * Start screen
 * Game over screen
-
-The project was created using:
-
-* HTML
-* CSS
-
-
