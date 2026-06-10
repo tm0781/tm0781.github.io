@@ -1,16 +1,23 @@
 <!DOCTYPE html>
 <html>
 <head>
+
     <title>Reflex Test: Neon Adventure</title>
 
     <style>
+
         body {
             margin: 0;
             overflow: hidden;
             font-family: Arial;
-            background-image: url("background.jpg");
+
+            background-image: url("images/background.jpg");
             background-size: cover;
             background-position: center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+
+            height: 100vh;
             color: white;
         }
 
@@ -47,10 +54,7 @@
             height: 20px;
             background: linear-gradient(90deg, #00ffff, #ff00ff);
             border-radius: 20px;
-            box-shadow:
-                0 0 10px cyan,
-                0 0 20px cyan,
-                0 0 40px purple;
+            box-shadow: 0 0 10px cyan, 0 0 20px cyan, 0 0 40px purple;
         }
 
         .part {
@@ -107,7 +111,6 @@
             background: white;
         }
 
-        /* Rainbow trail */
         .trail {
             position: absolute;
             width: 10px;
@@ -115,6 +118,7 @@
             border-radius: 50%;
             pointer-events: none;
         }
+
     </style>
 </head>
 
@@ -123,6 +127,7 @@
 <div id="title">⚡ Reflex Test: Neon Adventure ⚡</div>
 
 <div id="score">Score: 0</div>
+
 <div id="highscore">High Score: 0</div>
 
 <div id="basket"></div>
@@ -138,31 +143,27 @@
 </div>
 
 <script>
+
 let basket = document.getElementById("basket");
 let score = 0;
 let gameRunning = false;
 let speed = 18;
-
-/* HIGH SCORE */
 let highscore = localStorage.getItem("highscore") || 0;
+
 document.getElementById("highscore").innerText =
 "High Score: " + highscore;
 
-/* START GAME */
 function startGame() {
     document.getElementById("startScreen").style.display = "none";
     gameRunning = true;
 }
 
-/* RESTART */
 function restartGame() {
     location.reload();
 }
 
-/* MOVE BASKET */
 document.addEventListener("mousemove", e => {
-
-    let x = e.pageX - 70;
+    let x = e.clientX - 70;
 
     if (x < 0) x = 0;
 
@@ -173,36 +174,38 @@ document.addEventListener("mousemove", e => {
     basket.style.left = x + "px";
 });
 
-/* CREATE BLOCKS */
 function createPart() {
-
     if (!gameRunning) return;
 
     let part = document.createElement("div");
 
-    if (Math.random() > 0.25) {
-        part.className = "part good";
-    } else {
-        part.className = "part bad";
-    }
+    part.className =
+        "part " + (Math.random() > 0.25 ? "good" : "bad");
 
     part.style.left =
         Math.random() * (window.innerWidth - 30) + "px";
 
-    part.style.top = "0px";
+    part.style.top = "-40px";
 
     document.body.appendChild(part);
 
     let fall = setInterval(() => {
 
-        part.style.top = part.offsetTop + 6 + "px";
+        let top = part.offsetTop + 6;
+        part.style.top = top + "px";
 
-        /* COLLISION */
-        if (
-            part.offsetTop > window.innerHeight - 90 &&
-            part.offsetLeft > basket.offsetLeft &&
-            part.offsetLeft < basket.offsetLeft + 140
-        ) {
+        let basketLeft = basket.offsetLeft;
+        let basketRight = basketLeft + basket.offsetWidth;
+
+        let partLeft = part.offsetLeft;
+        let partRight = partLeft + part.offsetWidth;
+
+        let touching =
+            partRight > basketLeft &&
+            partLeft < basketRight &&
+            top + 30 > window.innerHeight - 70;
+
+        if (touching) {
 
             if (part.classList.contains("good")) {
                 score += 10;
@@ -212,34 +215,31 @@ function createPart() {
             }
 
             updateScore();
-
-            part.remove();
             clearInterval(fall);
+            part.remove();
         }
 
-        /* MISSED */
-        if (part.offsetTop > window.innerHeight) {
+        if (top > window.innerHeight) {
 
             if (part.classList.contains("good")) {
                 score -= 10;
             }
 
             updateScore();
-
-            part.remove();
             clearInterval(fall);
+            part.remove();
         }
 
     }, speed);
 }
 
-/* UPDATE SCORE */
 function updateScore() {
 
     document.getElementById("score").innerText =
         "Score: " + score;
 
     if (score > highscore) {
+
         highscore = score;
 
         localStorage.setItem("highscore", highscore);
@@ -249,19 +249,20 @@ function updateScore() {
     }
 
     if (score < -50) {
+
         gameRunning = false;
 
-        document.getElementById("gameOver").style.display = "flex";
+        document.getElementById("gameOver").style.display =
+            "flex";
     }
 }
 
-/* SCREEN SHAKE */
 function shakeScreen() {
 
-    document.body.style.transform = "translateX(10px)";
+    document.body.style.transform = "translateX(8px)";
 
     setTimeout(() => {
-        document.body.style.transform = "translateX(-10px)";
+        document.body.style.transform = "translateX(-8px)";
     }, 50);
 
     setTimeout(() => {
@@ -269,19 +270,16 @@ function shakeScreen() {
     }, 100);
 }
 
-/* SPAWN */
 setInterval(createPart, 700);
 
-/* HARDER OVER TIME */
 setInterval(() => {
 
-    if (speed > 8 && gameRunning) {
+    if (gameRunning && speed > 8) {
         speed--;
     }
 
 }, 5000);
 
-/* RAINBOW TRAIL */
 let trail = [];
 
 for (let i = 0; i < 20; i++) {
@@ -300,9 +298,8 @@ for (let i = 0; i < 20; i++) {
 }
 
 document.addEventListener("mousemove", e => {
-
-    trail[0].x = e.pageX;
-    trail[0].y = e.pageY;
+    trail[0].x = e.clientX;
+    trail[0].y = e.clientY;
 });
 
 function animateTrail() {
@@ -332,217 +329,8 @@ function animateTrail() {
 }
 
 animateTrail();
+
 </script>
-<script>
-let basket = document.getElementById("basket");
 
-let score = 0;
-let gameRunning = false;
-let speed = 18;
-
-/* HIGH SCORE */
-let highscore = localStorage.getItem("highscore") || 0;
-
-document.getElementById("highscore").innerText =
-"High Score: " + highscore;
-
-/* START */
-function startGame() {
-    document.getElementById("startScreen").style.display = "none";
-    gameRunning = true;
-}
-
-/* RESTART */
-function restartGame() {
-    location.reload();
-}
-
-/* MOVE BASKET */
-document.addEventListener("mousemove", e => {
-
-    let x = e.clientX - 70;
-
-    /* keep basket inside screen */
-    if (x < 0) x = 0;
-
-    if (x > window.innerWidth - 140) {
-        x = window.innerWidth - 140;
-    }
-
-    basket.style.left = x + "px";
-});
-
-/* CREATE BLOCKS */
-function createPart() {
-
-    if (!gameRunning) return;
-
-    let part = document.createElement("div");
-
-    part.className =
-        "part " + (Math.random() > 0.25 ? "good" : "bad");
-
-    part.style.left =
-        Math.random() * (window.innerWidth - 30) + "px";
-
-    part.style.top = "-40px";
-
-    document.body.appendChild(part);
-
-    let fall = setInterval(() => {
-
-        let top = part.offsetTop + 6;
-
-        part.style.top = top + "px";
-
-        /* collision */
-        let basketLeft = basket.offsetLeft;
-        let basketRight = basketLeft + basket.offsetWidth;
-
-        let partLeft = part.offsetLeft;
-        let partRight = partLeft + part.offsetWidth;
-
-        let touching =
-            partRight > basketLeft &&
-            partLeft < basketRight &&
-            top + 30 > window.innerHeight - 70;
-
-        if (touching) {
-
-            if (part.classList.contains("good")) {
-                score += 10;
-            } else {
-                score -= 20;
-                shakeScreen();
-            }
-
-            updateScore();
-
-            clearInterval(fall);
-            part.remove();
-        }
-
-        /* missed */
-        if (top > window.innerHeight) {
-
-            if (part.classList.contains("good")) {
-                score -= 10;
-            }
-
-            updateScore();
-
-            clearInterval(fall);
-            part.remove();
-        }
-
-    }, speed);
-}
-
-/* UPDATE SCORE */
-function updateScore() {
-
-    document.getElementById("score").innerText =
-        "Score: " + score;
-
-    if (score > highscore) {
-
-        highscore = score;
-
-        localStorage.setItem("highscore", highscore);
-
-        document.getElementById("highscore").innerText =
-            "High Score: " + highscore;
-    }
-
-    if (score < -50) {
-
-        gameRunning = false;
-
-        document.getElementById("gameOver").style.display =
-            "flex";
-    }
-}
-
-/* SHAKE */
-function shakeScreen() {
-
-    document.body.style.transform = "translateX(8px)";
-
-    setTimeout(() => {
-        document.body.style.transform = "translateX(-8px)";
-    }, 50);
-
-    setTimeout(() => {
-        document.body.style.transform = "translateX(0px)";
-    }, 100);
-}
-
-/* SPAWN */
-setInterval(createPart, 700);
-
-/* HARD MODE */
-setInterval(() => {
-
-    if (gameRunning && speed > 8) {
-        speed--;
-    }
-
-}, 5000);
-
-/* RAINBOW TRAIL */
-let trail = [];
-
-for (let i = 0; i < 20; i++) {
-
-    let dot = document.createElement("div");
-
-    dot.className = "trail";
-
-    document.body.appendChild(dot);
-
-    trail.push({
-        x: 0,
-        y: 0,
-        el: dot
-    });
-}
-
-document.addEventListener("mousemove", e => {
-
-    trail[0].x = e.clientX;
-    trail[0].y = e.clientY;
-});
-
-function animateTrail() {
-
-    for (let i = 0; i < trail.length; i++) {
-
-        let current = trail[i];
-        let next = trail[i - 1];
-
-        if (i !== 0) {
-
-            current.x +=
-                (next.x - current.x) * 0.35;
-
-            current.y +=
-                (next.y - current.y) * 0.35;
-        }
-
-        current.el.style.left = current.x + "px";
-        current.el.style.top = current.y + "px";
-
-        current.el.style.background =
-            `hsl(${i * 20}, 100%, 50%)`;
-
-        current.el.style.opacity =
-            1 - i / trail.length;
-    }
-
-    requestAnimationFrame(animateTrail);
-}
-
-animateTrail();
-</script>
 </body>
 </html>
